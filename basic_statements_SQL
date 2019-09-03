@@ -1,0 +1,11 @@
+use sakila;
+
+select * FROM actor;
+
+select COUNT(*) FROM actor;
+
+select last_name AS last, first_name AS first FROM actor;
+
+select * FROM actor;
+
+select * FROM actor where actor_id=6;
