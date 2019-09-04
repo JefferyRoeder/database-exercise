@@ -8,7 +8,7 @@ use employees;
 SELECT concat(first_name,' ',last_name) AS full_name FROM employees WHERE last_name LIKE 'E%E';
 
 -- testing question 2 looking for full name starting and ending with E
-SELECT *  AS full_name FROM employees WHERE concat(first_name,' ',last_name) LIKE 'E%E';
+SELECT *  AS full_name FROM employees WHERE concat(first_name,' ',last_name) LIKE 'e%e';
 
 -- #3 Convert the names produced in your last query to all uppercase.
 
