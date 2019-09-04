@@ -1,0 +1,20 @@
+select first_name, last_name
+from employees group by last_name, first_name;
+
+select count(*) FROM employees
+WHERE first_name NOT LIKE '%a%';
+
+SELECT count(first_name), first_name
+FROM employees
+group by first_name;
+
+select concat(first_name," ",last_name) as full_name, count(*)
+FROM employees
+group by full_name
+order by count(*) DESC;
+
+select * FROM employees
+WHERE last_name = 'Baalen' and first_name = 'Rosalyn';
+
+select concat(first_name," ",last_name) as full_name, count(*)
+from employees
