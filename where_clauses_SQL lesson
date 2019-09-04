@@ -1,0 +1,25 @@
+use sakila;
+
+SELECT * FROM film WHERE replacement_cost BETWEEN 18.99 and 20.99;
+
+select DISTINCT rental_rate FROM film;
+
+SELECT * FROM film;
+
+
+use employees;
+
+SELECT emp_no, first_name, last_name FROM employees
+WHERE emp_no <20000
+AND (last_name IN ('Herber','Baek') or first_name = 'Shridhar');
+
+use sakila; 
+
+SELECT * FROM film;
+
+SELECT * FROM payment WHERE (rental_id > 1000 AND staff_id=1) OR amount<5.99;
+
+
+SELECT * FROM customer WHERE first_name IN ('BARBARA','Joaquin','Sandra','John',"Joe",'Gary');
+
+SELECT * FROM customer WHERE first_name = 'Barbara' OR first_name
