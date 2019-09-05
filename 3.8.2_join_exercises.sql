@@ -131,11 +131,93 @@ LEFT JOIN titles on titles.emp_no = DE.emp_no
 LEFT JOIN departments on DE.dept_no = departments.dept_no
 LEFT JOIN employees on DE.emp_no = employees.emp_no
 LEFT JOIN salaries on DE.emp_no = salaries.emp_no
-WHERE DE.to_date = '9999-01-01' and titles.to_date = '9999-01-01' and titles.title = 'Manager'
+WHERE DE.to_date = '9999-01-01' and titles.to_date = '9999-01-01' and titles.title = 'Manager' and salaries.to_date = '9999-01-01'
+ORDER BY departments.dept_name
 ;
 
 
+-- #6 Find the number of employees in each department.
 
 
+SELECT D.dept_no, D.dept_name, count(*)
+FROM departments D
+JOIN dept_emp on D.dept_no = dept_emp.dept_no
+WHERE dept_emp.to_date = '9999-01-01'
+GROUP BY D.dept_no;
+
+-- #7 Which department has the highest average salary?
+
+SELECT departments.dept_name, avg(S.salary)
+FROM salaries S
+JOIN dept_emp ON dept_emp.emp_no = S.emp_no
+JOIN departments ON dept_emp.dept_no = departments.dept_no
+WHERE dept_emp.to_date = '9999-01-01' and S.to_date = '9999-01-01' AND departments.dept_name = "Sales"
+GROUP BY departments.dept_name
+;
+
+use employees;
+-- #8 Who is the highest paid employee in the Marketing department?
+
+SELECT employees.first_name, employees.last_name
+FROM salaries S
+JOIN dept_emp ON dept_emp.emp_no = S.emp_no
+JOIN departments ON dept_emp.dept_no = departments.dept_no
+JOIN employees ON employees.emp_no = S.emp_no
+
+WHERE dept_emp.to_date = '9999-01-01' and S.to_date = '9999-01-01' AND departments.dept_name = "Marketing"
+
+ORDER BY S.salary DESC
+LIMIT 1
+;
+
+-- #9 Which current department manager has the highest salary?
+
+SELECT employees.first_name, employees.last_name, S.salary, departments.dept_name
+FROM salaries S
+JOIN dept_emp ON dept_emp.emp_no = S.emp_no
+JOIN departments ON dept_emp.dept_no = departments.dept_no
+JOIN employees ON employees.emp_no = S.emp_no
+JOIN titles on S.emp_no = titles.emp_no
+
+WHERE dept_emp.to_date = '9999-01-01' and S.to_date = '9999-01-01' AND titles.to_date = '9999-01-01' AND titles.title = 'Manager'
+ORDER BY S.salary DESC
+LIMIT 1;
+
+-- #10 Bonus Find the names of all current employees, their department name, and their current manager's name.
+
+SELECT concat(E.first_name," ",E.last_name),D.dept_name, SQ.last_name, SQ.first_name
+FROM dept_emp DE
+JOIN departments D ON D.dept_no = DE.dept_no
+JOIN employees E ON E.emp_no = DE.emp_no
+JOIN 
+	(SELECT dept_manager.dept_no, employees.first_name, employees.last_name FROM dept_manager
+	JOIN employees on dept_manager.emp_no = employees.emp_no 
+	WHERE dept_manager.to_date = '9999-01-01') AS SQ ON SQ.dept_no = D.dept_no
+WHERE DE.to_date = '9999-01-01'
+ORDER BY D.dept_name, E.first_name
+;
 
 
+-- #11 Bonus Find the highest paid employee in each department.
+
+use employees;
+SELECT employees.first_name, employees.last_name, departments.dept_name, SQ.max_salary
+FROM salaries S
+JOIN dept_emp AS DE ON DE.emp_no = S.emp_no
+JOIN departments ON DE.dept_no = departments.dept_no
+JOIN employees ON employees.emp_no = S.emp_no
+JOIN titles on S.emp_no = titles.emp_no
+JOIN
+	(SELECT max(SS.salary) as max_salary, DS.dept_name, DES.dept_no as max_dept_no
+	FROM salaries SS
+	JOIN dept_emp AS DES on DES.emp_no = SS.emp_no
+	JOIN departments AS DS on DS.dept_no = DES.dept_no
+	WHERE DES.to_date = '9999-01-01' and SS.to_date = '9999-01-01'
+	GROUP BY DS.dept_name
+	) as SQ on SQ.max_dept_no = DE.dept_no
+WHERE DE.to_date = '9999-01-01' AND S.to_date = '9999-01-01' AND titles.to_date = '9999-01-01' AND S.salary = SQ.max_salary 
+
+ORDER BY departments.dept_name;
+	
+	
+	
