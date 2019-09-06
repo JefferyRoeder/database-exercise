@@ -1,0 +1,125 @@
+use employees;
+
+select * FROM departments;
+
+select * FROM dept_manager ORDER BY emp_no;
+
+select * FROM dept_emp ORDER BY emp_no, to_date;
+select * FROM employees;
+select * FROM titles;
+select * FROM salaries;
+
+WHERE emp_no = 101010;
+
+-- # 3.8.3_subqueries_exercises.sql
+
+-- #1 Find all the employees with the same hire date as employee 101010 using a sub-query.
+
+SELECT E.emp_no, E.hire_date
+FROM employees E
+WHERE E.hire_date IN (SELECT ES.hire_date FROM employees ES
+	WHERE ES.emp_no = 101010);
+	
+-- #2 Find all the titles held by all employees with the first name Aamod.
+
+SELECT T.title, count(T.title)
+FROM titles T
+WHERE T.emp_no IN (SELECT ES.emp_no FROM employees ES WHERE ES.first_name = 'Aamod')
+GROUP BY T.title 
+ORDER BY count(T.title) DESC
+
+;
+
+-- #3 How many people in the employees table are no longer working for the company?
+-- SELECT DE.emp_no, SQ.max_to_date, DE.to_date, DE.emp_no
+SELECT count(*) 
+FROM dept_emp DE
+JOIN(
+	SELECT DES.emp_no, max(DES.to_date) as max_to_date
+	FROM dept_emp DES
+	GROUP BY DES.emp_no
+	HAVING max(DES.to_date) <> '9999-01-01'
+	) as SQ on SQ.emp_no = DE.emp_no
+WHERE SQ.max_to_date = DE.to_date
+ORDER BY DE.emp_no, DE.to_date
+;
+
+-- #4 Find all the current department managers that are female.
+
+SELECT E.first_name, E.last_name
+FROM employees E
+JOIN
+
+	(SELECT DM.emp_no
+	FROM dept_manager DM
+	WHERE DM.to_date = '9999-01-01') AS SQ ON SQ.emp_no = E.emp_no
+WHERE E.gender = 'F';
+
+-- #5 Find all the employees that currently have a higher than average salary.
+SELECT E.first_name,E.last_name, S.salary
+FROM salaries S
+JOIN employees AS E ON E.emp_no = S.emp_no
+WHERE S.salary > 
+	(
+	SELECT avg(SS.salary) as avg_salary
+	FROM salaries SS
+	
+	)
+AND S.to_date = '9999-01-01'
+;
+
+-- #6 How many current salaries are within 1 standard deviation of the highest salary? (Hint: you can use a built in function to calculate the standard deviation.) What percentage of all salaries is this?
+
+SELECT SS.emp_no, SS.salary 
+	FROM salaries SS
+	ORDER BY SS.salary DESC
+	LIMIT 1
+	) AS SQ ON SQ.emp_no = E.emp_no
+
+
+
+
+	
+-- BONUS #1
+
+
+SELECT D.dept_name
+FROM employees E
+JOIN dept_manager AS DM on DM.emp_no = E.emp_no
+JOIN departments AS D ON D.dept_no = DM.dept_no
+JOIN
+
+	(SELECT DMS.emp_no
+	FROM dept_manager DMS
+	WHERE DMS.to_date = '9999-01-01') AS SQ ON SQ.emp_no = E.emp_no
+WHERE E.gender = 'F'
+ORDER BY D.dept_name;
+
+-- BONUS #2
+
+SELECT E.first_name, E.last_name
+FROM employees E
+JOIN 
+	(
+	SELECT SS.emp_no, SS.salary 
+	FROM salaries SS
+	ORDER BY SS.salary DESC
+	LIMIT 1
+	) AS SQ ON SQ.emp_no = E.emp_no
+	;
+
+-- BONUS #3
+
+SELECT D.dept_name
+FROM employees E
+JOIN dept_emp AS DE on DE.emp_no = E.emp_no
+JOIN departments AS D ON D.dept_no = DE.dept_no
+JOIN 
+	(
+	SELECT SS.emp_no, SS.salary 
+	FROM salaries SS
+	ORDER BY SS.salary DESC
+	LIMIT 1
+	) AS SQ ON SQ.emp_no = E.emp_no
+	;
+
