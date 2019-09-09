@@ -84,11 +84,34 @@ JOIN
  ORDER BY dept_name
  ;
  
+ 
+-- #4 What is the average salary for an employee based on the number of years they have been with the company? Express your answer in terms of the Z-score of salary.
+-- Since this data is a little older, scale the years of experience by subtracting the minumum from every row.
 
 
+CREATE TEMPORARY TABLE bayes_810.emp_sal_temp AS
+SELECT round((datediff(now(),hire_date)/365),0) AS years_with_company, avg(SQ.salary) 
+from employees
+JOIN 
+	(SELECT S.emp_no, S.salary 
+	FROM salaries S
+	WHERE to_date = '9999-01-01') 
+	AS SQ where SQ.emp_no = employees.emp_no
 
 
+GROUP BY years_with_company
+ORDER BY years_with_company
+;
+ALTER TABLE bayes_810.emp_sal_temp ADD join_temp INT DEFAULT 1;
+
+CREATE TEMPORARY TABLE bayes_810.min_years_temp AS 
+SELECT min((datediff(now(),hire_date)/365)) as min_years
+FROM employees;
+
+ALTER TABLE bayes_810.min_years_temp ADD join_temp INT DEFAULT 1;
 
 
-
+SELECT round(years_with_company - min_years,0) AS service_years, `avg(SQ.salary)` 
+FROM bayes_810.emp_sal_temp AS sal
+JOIN bayes_810.min_years_temp AS min ON min.join_temp = sal.join_temp;
 
